@@ -21,6 +21,17 @@
                 });
 
             element.on('mousedown', function(event) {
+                texts = element.find('input');
+                var isNotDraggable = false;
+                for(var i=0; i<texts.length; i++){
+                    if(event.target == texts[i]){
+                        isNotDraggable = true;
+                        break;
+                    }
+                }
+                if(isNotDraggable)
+                    return;
+                
                 event.preventDefault();
                 startX = event.pageX - x;
                 startY = event.pageY - y;
@@ -49,6 +60,14 @@
                 element.css({
                     borderColor: 'gray',
                 });
+                // updating data
+                var box = editor.getIndex(scope.current);
+                box.x = x;
+                box.y = y;
+                box.text = element.find('input').val();
+                var oldPrompt = document.querySelectorAll('#result')[0].innerText;
+                document.querySelectorAll('#result')[0].innerText = oldPrompt + 
+                    ' saved text: '+ box.text +' coords {' + box.x + ', ' + box.y + '}'; 
             }
         };
 
@@ -60,7 +79,7 @@
             scope:{
                 current: '=currentElementId'
             },
-            template: '<div>{{editor.getIndex(current).text}}</div>'
+            template: '<div><input type="text" value="{{editor.getIndex(current).text}}"></div>'
         };
     }]);
 
