@@ -26,6 +26,7 @@
                 startY = event.pageY - y;
                 $document.on('mousemove', mousemove);
                 $document.on('mouseup', mouseup);
+                editor.setCurrent(scope.current);
             });
 
             function mousemove(event) {
@@ -35,12 +36,12 @@
                     top: y + 'px',
                     left: x + 'px'
                 });
+                console.log(editor.current);
             }
 
             function mouseup() {
                 $document.off('mousemove', mousemove);
                 $document.off('mouseup', mouseup);
-                console.log("-->" + editor.template.elements[0].text);
             }
         };
 
@@ -48,7 +49,10 @@
             restrict:'A',
             link: link,
             controller:'editorController',
-            controllerAs:'editor'
+            controllerAs:'editor',
+            scope:{
+                current: '=currentElementId'
+            }
         };
     }]);
 

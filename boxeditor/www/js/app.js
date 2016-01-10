@@ -3,6 +3,10 @@
 
   app.controller('editorController', function(){
     this.template = template;
+    this.current = 0;
+    this.setCurrent = function(val){
+        this.current = val ? val : 0;
+    };
   });
 
   var template = {
