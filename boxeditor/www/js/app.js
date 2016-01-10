@@ -7,6 +7,9 @@
     this.setCurrent = function(val){
         this.current = val ? val : 0;
     };
+    this.getIndex = function(idx){
+        return this.template.elements[idx];
+    };
   });
 
   var template = {

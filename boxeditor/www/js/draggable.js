@@ -1,7 +1,7 @@
 (function() {
     var app = angular.module('draggable', []);   
 
-    app.directive('myDraggable', ['$document', function($document) {
+    app.directive('templateCanvas', ['$document', function($document) {
         var link = function(scope, element, attr, editor) {
             var startX = 0,
                 startY = 0,
@@ -9,24 +9,29 @@
                 y = 0;
 
             element.css({
-                position: 'relative',
-                border: '1px solid red',
-                backgroundColor: 'lightgrey',
-                cursor: 'pointer' /*,
-                top: editor.y,
-                left: editor.x,
-                width: editor.width + 'px',
-                height: editor.height + 'px',*/
+                position: 'absolute',
+                borderStyle: 'solid',
+                borderWidth: 'small',
+                borderColor: 'gray',
+                cursor: 'move',
+                top: editor.getIndex(scope.current).y,
+                left: editor.getIndex(scope.current).x,
+                width: editor.getIndex(scope.current).width + 'px',
+                height: editor.getIndex(scope.current).height + 'px'
                 });
 
             element.on('mousedown', function(event) {
-                // Prevent default dragging of selected content
                 event.preventDefault();
                 startX = event.pageX - x;
                 startY = event.pageY - y;
                 $document.on('mousemove', mousemove);
                 $document.on('mouseup', mouseup);
+                               
+                element.css({
+                    borderColor: 'red',
+                });
                 editor.setCurrent(scope.current);
+                document.querySelectorAll('#result')[0].innerText = 'selected box: ' + scope.current;
             });
 
             function mousemove(event) {
@@ -36,23 +41,26 @@
                     top: y + 'px',
                     left: x + 'px'
                 });
-                console.log(editor.current);
             }
 
             function mouseup() {
                 $document.off('mousemove', mousemove);
                 $document.off('mouseup', mouseup);
+                element.css({
+                    borderColor: 'gray',
+                });
             }
         };
 
         return {
-            restrict:'A',
+            restrict:'E',
             link: link,
             controller:'editorController',
             controllerAs:'editor',
             scope:{
                 current: '=currentElementId'
-            }
+            },
+            template: '<div>{{editor.getIndex(current).text}}</div>'
         };
     }]);
 
