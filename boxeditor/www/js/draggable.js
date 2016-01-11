@@ -1,23 +1,26 @@
 (function() {
     var app = angular.module('draggable', []);   
 
-    app.directive('templateCanvas', ['$document', function($document) {
-        var link = function(scope, element, attr, editor) {
+    app.directive('templateBox', ['$document', function($document) {
+            
+        var link = function(scope, element, attr, ctrl) {
             var startX = 0,
                 startY = 0,
                 x = 0,
                 y = 0;
+            scope.box = ctrl.getIndex(scope.idx);
+            scope.box.element = element;
 
             element.css({
                 position: 'absolute',
                 borderStyle: 'solid',
                 borderWidth: 'small',
-                borderColor: 'gray',
+                borderColor: ctrl.isSelected(scope.idx) ? 'red' : 'gray',
                 cursor: 'move',
-                top: editor.getIndex(scope.current).y,
-                left: editor.getIndex(scope.current).x,
-                width: editor.getIndex(scope.current).width + 'px',
-                height: editor.getIndex(scope.current).height + 'px'
+                top: scope.box.y,
+                left: scope.box.x,
+                width: scope.box.width + 'px',
+                height: scope.box.height + 'px'
                 });
 
             element.on('mousedown', function(event) {
@@ -37,12 +40,10 @@
                 startY = event.pageY - y;
                 $document.on('mousemove', mousemove);
                 $document.on('mouseup', mouseup);
-                               
-                element.css({
-                    borderColor: 'red',
-                });
-                editor.setCurrent(scope.current);
-                document.querySelectorAll('#result')[0].innerText = 'selected box: ' + scope.current;
+                   
+                ctrl.setCurrent(scope.idx);
+                document.activeElement.blur();
+                document.querySelectorAll('#result')[0].innerText = 'selected box: ' + scope.idx;
             });
 
             function mousemove(event) {
@@ -57,29 +58,24 @@
             function mouseup() {
                 $document.off('mousemove', mousemove);
                 $document.off('mouseup', mouseup);
-                element.css({
-                    borderColor: 'gray',
-                });
                 // updating data
-                var box = editor.getIndex(scope.current);
-                box.x = x;
-                box.y = y;
-                box.text = element.find('input').val();
+                scope.box.x = x;
+                scope.box.y = y;
+                scope.box.text = element.find('input').val();
                 var oldPrompt = document.querySelectorAll('#result')[0].innerText;
                 document.querySelectorAll('#result')[0].innerText = oldPrompt + 
-                    ' saved text: '+ box.text +' coords {' + box.x + ', ' + box.y + '}'; 
+                    ' saved text: '+ scope.box.text +' coords {' + scope.box.x + ', ' + scope.box.y + '}'; 
             }
         };
 
         return {
+            require: '^templateCanvas',
             restrict:'E',
-            link: link,
-            controller:'editorController',
-            controllerAs:'editor',
             scope:{
-                current: '=currentElementId'
+                idx: '='
             },
-            template: '<div><input type="text" value="{{editor.getIndex(current).text}}"></div>'
+            link: link,
+            template: '<div class="template-box"><input type="text" value="{{box.text}}" style="border:none; width:90%; background: none;"></div>'
         };
     }]);
 
